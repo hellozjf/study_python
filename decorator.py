@@ -66,8 +66,10 @@ def metric(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kw):
         now_time = datetime.datetime.now()
+        print('now_time =', now_time)
         result = fn(*args, **kw)
-        print('%s executed in %d ms' % (fn.__name__, datetime.datetime.now() - now_time))
+        last = datetime.datetime.now() - now_time
+        print('%s executed in %d.%06d s' % (fn.__name__, last.seconds, last.microseconds))
         return result
     return wrapper
 
@@ -75,13 +77,17 @@ def metric(fn):
 # 测试
 @metric
 def fast(x, y):
+    print('before time.sleep(0.0012)')
     time.sleep(0.0012)
+    print('after time.sleep(0.0012)')
     return x + y
 
 
 @metric
 def slow(x, y, z):
+    print('before time.sleep(0.1234)')
     time.sleep(0.1234)
+    print('after time.sleep(0.1234)')
     return x * y * z
 
 
@@ -91,4 +97,6 @@ if f != 33:
     print('测试失败!')
 elif s != 7986:
     print('测试失败!')
+else:
+    print('测试成功')
 
